@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { productos as Productos } from '@prisma/client';
+import { productos as Productos, Prisma } from '@prisma/client';
+
 @Injectable()
 export class ProductosService {
   constructor(private readonly prisma: PrismaService) {}
@@ -8,48 +9,39 @@ export class ProductosService {
   async getAllProducts(): Promise<Productos[]> {
     return await this.prisma.productos.findMany();
   }
+
+  async getById(id: number): Promise<Productos> {
+    const product = await this.prisma.productos.findUnique({
+      where: { id },
+    });
+    if (!product) {
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+    }
+    return product;
+  }
+
+  async createProduct(data: Prisma.productosCreateInput): Promise<Productos> {
+    return await this.prisma.productos.create({
+      data,
+    });
+  }
+
+  async updateProduct(
+    id: number,
+    data: Prisma.productosUpdateInput,
+  ): Promise<Productos> {
+    await this.getById(id);
+    return await this.prisma.productos.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteProduct(id: number): Promise<Productos> {
+    await this.getById(id);
+    return await this.prisma.productos.update({
+      where: { id },
+      data: { estado: 0 },
+    });
+  }
 }
-// EJEMPLO DE TASKS
-// import { Task } from '@prisma/client';
-// import { PrismaService } from '../src/prisma/prisma.service';
-// import { Injectable } from '@nestjs/common';
-
-// @Injectable()
-// export class TaskService {
-//   constructor(private prisma: PrismaService) {}
-
-//   async getAllTasks(): Promise<Task[]> {
-//     return this.prisma.task.findMany();
-//   }
-
-//   async getTaskById(id: number): Promise<Task | null> {
-//     return this.prisma.task.findUnique({
-//       where: {
-//         id: id,
-//       },
-//     });
-//   }
-
-//   async createTask(data: Task): Promise<Task> {
-//     return this.prisma.task.create({
-//       data,
-//     });
-//   }
-
-//   async updateTask(id: number, data: Task): Promise<Task> {
-//     return this.prisma.task.update({
-//       where: {
-//         id: id,
-//       },
-//       data,
-//     });
-//   }
-
-//   async deleteTask(id: number): Promise<Task> {
-//     return await this.prisma.task.delete({
-//       where: {
-//         id: id,
-//       },
-//     });
-//   }
-// }
