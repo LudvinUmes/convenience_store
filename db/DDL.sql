@@ -9,7 +9,7 @@ CREATE SCHEMA IF NOT EXISTS store_db;
 SET search_path TO store_db;
 
 -- Tabla marcas
-CREATE TABLE IF NOT EXISTS store_db.marcas (
+CREATE TABLE IF NOT EXISTS marcas (
   id SERIAL PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
   usuario_creacion INT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS store_db.marcas (
 );
 
 -- Tabla tipos_producto
-CREATE TABLE IF NOT EXISTS store_db.tipos_producto (
+CREATE TABLE IF NOT EXISTS tipos_producto (
   id SERIAL PRIMARY KEY,
   name VARCHAR(45) NOT NULL,
   usuario_creacion INT NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS store_db.tipos_producto (
 );
 
 -- Tabla productos
-CREATE TABLE IF NOT EXISTS store_db.productos (
+CREATE TABLE IF NOT EXISTS productos (
   id SERIAL PRIMARY KEY,
   nombre VARCHAR(45) NOT NULL,
   descripcion TEXT NULL,
@@ -46,12 +46,12 @@ CREATE TABLE IF NOT EXISTS store_db.productos (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  CONSTRAINT fk_productos_tipos_producto1 FOREIGN KEY (id_tipo) REFERENCES store_db.tipos_producto (id),
-  CONSTRAINT fk_productos_marcas1 FOREIGN KEY (id_marca) REFERENCES store_db.marcas (id)
+  CONSTRAINT fk_productos_tipos_producto1 FOREIGN KEY (id_tipo) REFERENCES tipos_producto (id),
+  CONSTRAINT fk_productos_marcas1 FOREIGN KEY (id_marca) REFERENCES marcas (id)
 );
 
 -- Tabla lote_productos
-CREATE TABLE IF NOT EXISTS store_db.lote_productos (
+CREATE TABLE IF NOT EXISTS lote_productos (
   id SERIAL PRIMARY KEY,
   id_producto INT NOT NULL,
   costo_unitario NUMERIC(20, 2) NOT NULL,
@@ -65,11 +65,11 @@ CREATE TABLE IF NOT EXISTS store_db.lote_productos (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  CONSTRAINT fk_lote_productos_productos1 FOREIGN KEY (id_producto) REFERENCES store_db.productos (id)
+  CONSTRAINT fk_lote_productos_productos1 FOREIGN KEY (id_producto) REFERENCES productos (id)
 );
 
 -- Tabla ventas
-CREATE TABLE IF NOT EXISTS store_db.ventas (
+CREATE TABLE IF NOT EXISTS ventas (
   id SERIAL PRIMARY KEY,
   fecha_venta TIMESTAMP NOT NULL,
   total NUMERIC(20, 2) NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS store_db.ventas (
 );
 
 -- Tabla detalle_ventas
-CREATE TABLE IF NOT EXISTS store_db.detalle_ventas (
+CREATE TABLE IF NOT EXISTS detalle_ventas (
   id SERIAL PRIMARY KEY,
   id_venta INT NOT NULL,
   cantidad INT NOT NULL,
@@ -98,12 +98,12 @@ CREATE TABLE IF NOT EXISTS store_db.detalle_ventas (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  CONSTRAINT fk_salida_has_productos_lotes_salida1 FOREIGN KEY (id_venta) REFERENCES store_db.ventas (id),
-  CONSTRAINT fk_detalle_venta_lote_productos1 FOREIGN KEY (id_lote_producto) REFERENCES store_db.lote_productos (id)
+  CONSTRAINT fk_salida_has_productos_lotes_salida1 FOREIGN KEY (id_venta) REFERENCES ventas (id),
+  CONSTRAINT fk_detalle_venta_lote_productos1 FOREIGN KEY (id_lote_producto) REFERENCES lote_productos (id)
 );
 
 -- Tabla pagos
-CREATE TABLE IF NOT EXISTS store_db.pagos (
+CREATE TABLE IF NOT EXISTS pagos (
   id SERIAL PRIMARY KEY,
   metodo_pago VARCHAR(50) NOT NULL CHECK (metodo_pago IN ('Efectivo', 'Tarjeta Crédito', 'Tarjeta Débito', 'Transferencia')),
   monto NUMERIC(10, 2) NOT NULL,
@@ -113,11 +113,11 @@ CREATE TABLE IF NOT EXISTS store_db.pagos (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  CONSTRAINT fk_pagos_facturacion1 FOREIGN KEY (id_venta) REFERENCES store_db.ventas (id)
+  CONSTRAINT fk_pagos_facturacion1 FOREIGN KEY (id_venta) REFERENCES ventas (id)
 );
 
 -- Tabla devoluciones
-CREATE TABLE IF NOT EXISTS store_db.devoluciones (
+CREATE TABLE IF NOT EXISTS devoluciones (
   id SERIAL PRIMARY KEY,
   id_venta INT NOT NULL,
   fecha_devolucion TIMESTAMP NOT NULL,
@@ -127,22 +127,22 @@ CREATE TABLE IF NOT EXISTS store_db.devoluciones (
   fecha_creacion TIMESTAMP NOT NULL,
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
-  CONSTRAINT fk_devoluciones_facturacion1 FOREIGN KEY (id_venta) REFERENCES store_db.ventas (id)
+  CONSTRAINT fk_devoluciones_facturacion1 FOREIGN KEY (id_venta) REFERENCES ventas (id)
 );
 
 -- Tabla devoluciones_detalle
-CREATE TABLE IF NOT EXISTS store_db.devoluciones_detalle (
+CREATE TABLE IF NOT EXISTS devoluciones_detalle (
   id_detalle SERIAL PRIMARY KEY,
   cantidad INT NOT NULL,
   monto_reembolso NUMERIC(10, 2) NOT NULL,
   id_devolucione INT NOT NULL,
   id_detalle_venta INT NOT NULL,
-  CONSTRAINT fk_devoluciones_detalle_devoluciones1 FOREIGN KEY (id_devolucione) REFERENCES store_db.devoluciones (id),
-  CONSTRAINT fk_devoluciones_detalle_detalle_ventas1 FOREIGN KEY (id_detalle_venta) REFERENCES store_db.detalle_ventas (id)
+  CONSTRAINT fk_devoluciones_detalle_devoluciones1 FOREIGN KEY (id_devolucione) REFERENCES devoluciones (id),
+  CONSTRAINT fk_devoluciones_detalle_detalle_ventas1 FOREIGN KEY (id_detalle_venta) REFERENCES detalle_ventas (id)
 );
 
 -- Tabla combos
-CREATE TABLE IF NOT EXISTS store_db.combos (
+CREATE TABLE IF NOT EXISTS combos (
   id SERIAL PRIMARY KEY,
   descripcion TEXT NOT NULL,
   nombre VARCHAR(45) NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS store_db.combos (
 );
 
 -- Tabla recetas
-CREATE TABLE IF NOT EXISTS store_db.recetas (
+CREATE TABLE IF NOT EXISTS recetas (
   id SERIAL PRIMARY KEY,
   id_producto INT NOT NULL,
   unidad_medida VARCHAR(45) NOT NULL,
@@ -165,15 +165,15 @@ CREATE TABLE IF NOT EXISTS store_db.recetas (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  CONSTRAINT fk_asignacion_materias_primas_receta_productos1 FOREIGN KEY (id_producto) REFERENCES store_db.productos (id)
+  CONSTRAINT fk_asignacion_materias_primas_receta_productos1 FOREIGN KEY (id_producto) REFERENCES productos (id)
 );
 
 -- Tabla asignacion_combos_productos
-CREATE TABLE IF NOT EXISTS store_db.asignacion_combos_productos (
+CREATE TABLE IF NOT EXISTS asignacion_combos_productos (
   id SERIAL PRIMARY KEY,
   id_combo INT NOT NULL,
   id_lote_producto INT NOT NULL,
   cantidad INT NOT NULL,
-  CONSTRAINT fk_asignacion_combos_productos_prep_combos1 FOREIGN KEY (id_combo) REFERENCES store_db.combos (id),
-  CONSTRAINT fk_asignacion_combos_productos_prep_lote_productos1 FOREIGN KEY (id_lote_producto) REFERENCES store_db.lote_productos (id)
+  CONSTRAINT fk_asignacion_combos_productos_prep_combos1 FOREIGN KEY (id_combo) REFERENCES combos (id),
+  CONSTRAINT fk_asignacion_combos_productos_prep_lote_productos1 FOREIGN KEY (id_lote_producto) REFERENCES lote_productos (id)
 );
