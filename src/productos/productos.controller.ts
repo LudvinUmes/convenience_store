@@ -20,6 +20,7 @@ export class ProductosController {
     return await this.productosService.getAllProducts();
   }
 
+  // Obtener Producto por ID
   @Get(':id')
   async obtenerPorId(
     @Param('id', ParseIntPipe) id: number,
