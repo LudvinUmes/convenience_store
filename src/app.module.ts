@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductosModule } from './productos/productos.module';
-import { Tipos_productoModule } from './tipos_producto/tipos_producto.module';
+import { CategoriasModule } from './categorias/categorias.module';
 import { MarcasModule } from './marcas/marcas.module';
 import { Lote_productosModule } from './lotes/lotes.module';
 import { RecetasModule } from './recetas/recetas.module';
@@ -12,7 +12,7 @@ import { DevolucionesModule } from './devoluciones/devoluciones.module';
   imports: [
     PrismaModule,
     ProductosModule,
-    Tipos_productoModule,
+    CategoriasModule,
     MarcasModule,
     Lote_productosModule,
     RecetasModule,
