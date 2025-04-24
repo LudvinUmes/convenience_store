@@ -5,6 +5,8 @@ import { Tipos_productoModule } from './tipos_producto/tipos_producto.module';
 import { MarcasModule } from './marcas/marcas.module';
 import { Lote_productosModule } from './lotes/lotes.module';
 import { RecetasModule } from './recetas/recetas.module';
+import { VentasModule } from './ventas/ventas.module';
+import { DevolucionesModule } from './devoluciones/devoluciones.module';
 
 @Module({
   imports: [
@@ -14,6 +16,10 @@ import { RecetasModule } from './recetas/recetas.module';
     MarcasModule,
     Lote_productosModule,
     RecetasModule,
+    VentasModule,
+    DevolucionesModule
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
