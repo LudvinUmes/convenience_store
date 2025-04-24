@@ -117,7 +117,7 @@ model productos {
   lote_productos                  lote_productos[]
   marcas                          marcas                            @relation(fields: [id_marca], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_marcas")
   recetas                         recetas                           @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_recetas1")
-  tipos_producto                  categoria                         @relation(fields: [id_tipo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_tipos")
+  categoria                  categoria                         @relation(fields: [id_tipo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_tipos")
 
   @@index([id_marca], map: "fk_productos_marcas1_idx")
   @@index([id_receta], map: "fk_productos_recetas1_idx")
