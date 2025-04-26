@@ -34,9 +34,11 @@ CREATE TABLE IF NOT EXISTS public.recetas (
   usuario_creacion INT NOT NULL,
   fecha_creacion TIMESTAMP NOT NULL,
   usuario_modificacion INT NULL,
-  fecha_modificacion TIMESTAMP NULL,
+  fecha_modificacion TIMESTAMP NULL,  
   estado SMALLINT NOT NULL,
-  PRIMARY KEY (id));
+  id_producto_final INT NOT NULL,
+  PRIMARY KEY (id)
+);
 
 -- -----------------------------------------------------
 -- Table public.productos
@@ -57,7 +59,6 @@ CREATE TABLE IF NOT EXISTS public.productos (
   usuario_modificacion INT NULL,
   fecha_modificacion TIMESTAMP NULL,
   estado SMALLINT NOT NULL,
-  id_receta INT NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_productos_tipos_producto1
     FOREIGN KEY (id_tipo)
@@ -68,16 +69,11 @@ CREATE TABLE IF NOT EXISTS public.productos (
     FOREIGN KEY (id_marca)
     REFERENCES public.marcas (id)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT fk_productos_recetas1
-    FOREIGN KEY (id_receta)
-    REFERENCES public.recetas (id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION
+  );
 
 CREATE INDEX fk_productos_tipos_producto1_idx ON public.productos (id_tipo ASC);
 CREATE INDEX fk_productos_marcas1_idx ON public.productos (id_marca ASC);
-CREATE INDEX fk_productos_recetas1_idx ON public.productos (id_receta ASC);
 
 -- -----------------------------------------------------
 -- Table public.lote_productos
