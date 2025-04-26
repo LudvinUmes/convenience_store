@@ -1,26 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Categoria as Categorias, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoriasService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCategoriaDto: any) {
-    return this.prisma.categoria.create({
-      data: createCategoriaDto,
+  async create(data: Prisma.CategoriaCreateInput): Promise<Categorias> {
+    const prismaAny = this.prisma as any;
+    return prismaAny.categoria.create({
+      data,
     });
   }
 
-  async findAll() {
-    return this.prisma.categoria.findMany({
+  async findAll(): Promise<Categorias[]> {
+    const prismaAny = this.prisma as any;
+    return prismaAny.categoria.findMany({
       include: {
         productos: true,
       },
     });
   }
 
-  async findOne(id: number) {
-    return this.prisma.categoria.findUnique({
+  async findOne(id: number): Promise<Categorias> {
+    const prismaAny = this.prisma as any;
+    return prismaAny.categoria.findUnique({
       where: { id },
       include: {
         productos: true,
@@ -28,15 +32,17 @@ export class CategoriasService {
     });
   }
 
-  async update(id: number, updateCategoriaDto: any) {
-    return this.prisma.categoria.update({
+  async update(id: number, data: Prisma.CategoriaUpdateInput): Promise<Categorias> {
+    const prismaAny = this.prisma as any;
+    return prismaAny.categoria.update({
       where: { id },
-      data: updateCategoriaDto,
+      data,
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.categoria.delete({
+  async remove(id: number): Promise<Categorias> {
+    const prismaAny = this.prisma as any;
+    return prismaAny.categoria.delete({
       where: { id },
     });
   }
