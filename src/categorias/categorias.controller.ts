@@ -9,37 +9,37 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { CategoriasService } from './categorias.service';
-import { Categoria as Categorias, Prisma } from '@prisma/client';
+import { categoria, Prisma } from '@prisma/client';
 
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
   @Get()
-  async obtenerTodos(): Promise<Categorias[]> {
+  async obtenerTodos(): Promise<categoria[]> { 
     return await this.categoriasService.findAll();
   }
 
   @Get(':id')
-  async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Categorias> {
+  async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<categoria> {
     return await this.categoriasService.findOne(id);
   }
 
   @Post()
-  async crear(@Body() data: Prisma.CategoriaCreateInput): Promise<Categorias> {
+  async crear(@Body() data: Prisma.categoriaCreateInput): Promise<categoria> { 
     return await this.categoriasService.create(data);
   }
 
   @Put(':id')
   async actualizar(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Prisma.CategoriaUpdateInput,
-  ): Promise<Categorias> {
+    @Body() data: Prisma.categoriaUpdateInput,
+  ): Promise<categoria> { 
     return await this.categoriasService.update(id, data);
   }
 
   @Delete(':id')
-  async eliminar(@Param('id', ParseIntPipe) id: number): Promise<Categorias> {
+  async eliminar(@Param('id', ParseIntPipe) id: number): Promise<categoria> {
     return await this.categoriasService.remove(id);
   }
 }

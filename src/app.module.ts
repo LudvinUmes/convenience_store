@@ -7,6 +7,8 @@ import { Lote_productosModule } from './lotes/lotes.module';
 import { RecetasModule } from './recetas/recetas.module';
 import { VentasModule } from './ventas/ventas.module';
 import { DevolucionesModule } from './devoluciones/devoluciones.module';
+import {MateriasPrimaModule} from './materias_primas/materia_prima.module';
+import { AsignacionRecetaModule } from './asignacion_recetas/asignacion_receta.module';
 
 @Module({
   imports: [
@@ -17,7 +19,9 @@ import { DevolucionesModule } from './devoluciones/devoluciones.module';
     Lote_productosModule,
     RecetasModule,
     VentasModule,
-    DevolucionesModule
+    DevolucionesModule,
+    MateriasPrimaModule,
+    AsignacionRecetaModule
   ],
   controllers: [],
   providers: [],
