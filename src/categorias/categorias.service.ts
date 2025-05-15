@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Categoria as Categorias, Prisma } from '@prisma/client';
+import { categoria as Categorias, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoriasService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.CategoriaCreateInput): Promise<Categorias> {
+  async create(data: Prisma.categoriaCreateInput): Promise<Categorias> {
     const prismaAny = this.prisma as any;
     return prismaAny.categoria.create({
       data,
@@ -32,7 +32,7 @@ export class CategoriasService {
     });
   }
 
-  async update(id: number, data: Prisma.CategoriaUpdateInput): Promise<Categorias> {
+  async update(id: number, data: Prisma.categoriaUpdateInput): Promise<Categorias> {
     const prismaAny = this.prisma as any;
     return prismaAny.categoria.update({
       where: { id },
