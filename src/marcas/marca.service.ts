@@ -7,12 +7,16 @@ export class marcasService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAll(): Promise<Marcas[]> {
-    return await this.prisma.marcas.findMany();
+    return await this.prisma.marcas.findMany(
+      {
+        where: { estado: 1 },
+      }
+    );
   }
 
   async getById(id: number): Promise<Marcas> {
     const item = await this.prisma.marcas.findUnique({
-      where: { id },
+      where: { id, estado: 1 },
     });
     if (!item) {
       throw new NotFoundException(`Elemento con ID ${id} no encontrado`);
