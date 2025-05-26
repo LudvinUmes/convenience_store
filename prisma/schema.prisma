@@ -16,19 +16,17 @@ model detalle_ventas {
   descuento            Decimal?               @db.Decimal(18, 2)
   id_producto          Int
   id_lote_producto     Int?
+  id_combo             Int?
   usuario_creacion     Int
-  fecha_creacion       DateTime               @db.Timestamp(6)
+  fecha_creacion       DateTime               @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
   fecha_modificacion   DateTime?              @db.Timestamp(6)
-  estado               Int                    @db.SmallInt
+  estado               Int                    @default(1) @db.SmallInt
+  combos               combos?                @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction)
   lote_productos       lote_productos?        @relation(fields: [id_lote_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_lote")
   productos            productos              @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_productos1")
   ventas               ventas                 @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_venta")
   devoluciones_detalle devoluciones_detalle[]
-
-  @@index([id_lote_producto], map: "fk_detalle_venta_lote_productos1_idx")
-  @@index([id_producto], map: "fk_detalle_ventas_productos1_idx")
-  @@index([id_venta], map: "fk_salida_has_productos_lotes_salida1_idx")
 }
 
 model devoluciones {
@@ -36,46 +34,43 @@ model devoluciones {
   id_venta             Int
   fecha_devolucion     DateTime               @db.Timestamp(6)
   motivo               String
-  estado               String                 @db.VarChar(20)
+  estado_devolucion    String                 @db.VarChar(20)
   usuario_creacion     Int
-  fecha_creacion       DateTime               @db.Timestamp(6)
+  fecha_creacion       DateTime               @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
   fecha_modificacion   DateTime?              @db.Timestamp(6)
+  estado               Int                    @default(1) @db.SmallInt
   ventas               ventas                 @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_devoluciones_venta")
   devoluciones_detalle devoluciones_detalle[]
-
-  @@index([id_venta], map: "fk_devoluciones_facturacion1_idx")
 }
 
 model lote_productos {
-  id                          Int                           @id
-  id_producto                 Int
-  costo_unitario              Decimal                       @db.Decimal(18, 2)
-  precio_lote                 Decimal                       @db.Decimal(10, 2)
-  stock                       Int
-  fecha_ingreso               DateTime                      @db.Timestamp(6)
-  fecha_vencimiento           DateTime                      @db.Timestamp(6)
-  descripcion                 String?
-  usuario_creacion            Int
-  fecha_creacion              DateTime                      @db.Timestamp(6)
-  usuario_modificacion        Int?
-  fecha_modificacion          DateTime?                     @db.Timestamp(6)
-  estado                      Int                           @db.SmallInt
-  asignacion_combos_productos asignacion_combos_productos[]
-  detalle_ventas              detalle_ventas[]
-  productos                   productos                     @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lote_productos_productos")
-
-  @@index([id_producto], map: "fk_lote_productos_productos1_idx")
+  id                     Int                      @id @default(autoincrement())
+  id_producto            Int
+  costo_unitario         Decimal                  @db.Decimal(18, 2)
+  precio_lote            Decimal                  @db.Decimal(10, 2)
+  stock                  Int
+  fecha_ingreso          DateTime                 @db.Timestamp(6)
+  fecha_vencimiento      DateTime                 @db.Timestamp(6)
+  descripcion            String?
+  usuario_creacion       Int
+  fecha_creacion         DateTime                 @default(now()) @db.Timestamp(6)
+  usuario_modificacion   Int?
+  fecha_modificacion     DateTime?                @db.Timestamp(6)
+  estado                 Int                      @default(1) @db.SmallInt
+  detalle_ventas         detalle_ventas[]
+  productos              productos                @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lote_productos_productos")
+  movimientos_inventario movimientos_inventario[]
 }
 
 model marcas {
   id                   Int         @id @default(autoincrement())
-  nombre               String      @db.VarChar(100)
+  nombre               String      @unique @db.VarChar(100)
   usuario_creacion     Int
-  fecha_creacion       DateTime    @db.Timestamp(6)
+  fecha_creacion       DateTime    @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
   fecha_modificacion   DateTime?   @db.Timestamp(6)
-  estado               Int         @db.SmallInt
+  estado               Int         @default(1) @db.SmallInt
   productos            productos[]
 }
 
@@ -85,43 +80,40 @@ model pagos {
   monto                Decimal   @db.Decimal(10, 2)
   id_venta             Int
   usuario_creacion     Int
-  fecha_creacion       DateTime  @db.Timestamp(6)
+  fecha_creacion       DateTime  @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
   fecha_modificacion   DateTime? @db.Timestamp(6)
-  estado               Int       @db.SmallInt
+  estado               Int       @default(1) @db.SmallInt
   ventas               ventas    @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pagos_venta")
-
-  @@index([id_venta], map: "fk_pagos_facturacion1_idx")
 }
 
 model productos {
-  id                              Int                               @id @default(autoincrement())
-  nombre                          String                            @db.VarChar(45)
-  descripcion                     String?
-  precio_referencia               Decimal                           @db.Decimal(20, 18)
-  unidad_medida                   String                            @db.VarChar(45)
-  stock                           Int
-  stock_minimo                    Int
-  id_tipo                         Int
-  id_marca                        Int
-  es_materia_prima                Boolean
-  usuario_creacion                Int
-  fecha_creacion                  DateTime                          @db.Timestamp(6)
-  usuario_modificacion            Int?
-  fecha_modificacion              DateTime?                         @db.Timestamp(6)
-  estado                          Int                               @db.SmallInt
-  id_receta                       Int
-  asignacion_combos_productos     asignacion_combos_productos[]
-  asignacion_receta_materia_prima asignacion_receta_materia_prima[]
-  detalle_ventas                  detalle_ventas[]
-  lote_productos                  lote_productos[]
-  marcas                          marcas                            @relation(fields: [id_marca], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_marcas")
-  recetas                         recetas                           @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_recetas1")
-  categoria                  categoria                         @relation(fields: [id_tipo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_tipos")
-
-  @@index([id_marca], map: "fk_productos_marcas1_idx")
-  @@index([id_receta], map: "fk_productos_recetas1_idx")
-  @@index([id_tipo], map: "fk_productos_tipos_producto1_idx")
+  id                          Int                                           @id @default(autoincrement())
+  nombre                      String                                        @db.VarChar(45)
+  descripcion                 String?
+  precio_referencia           Decimal                                       @db.Decimal(20, 18)
+  id_unidad_medida            Int
+  stock_minimo                Int
+  id_categoria                Int
+  tipo                        tipo_producto_enum                            @default(FINAL)
+  id_marca                    Int?
+  es_materia_prima            Boolean
+  receta                      String?
+  usuario_creacion            Int
+  fecha_creacion              DateTime                                      @default(now()) @db.Timestamp(6)
+  usuario_modificacion        Int?
+  fecha_modificacion          DateTime?                                     @db.Timestamp(6)
+  estado                      Int                                           @default(1) @db.SmallInt
+  alertas_stock               alertas_stock[]
+  asignacion_combos_productos asignacion_combos_productos[]
+  preparadoComoMateriaPrima   asignacion_producto_preparado_materia_prima[] @relation("ingredientesUsadosComoMateriaPrima")
+  preparadoComoProductoFinal  asignacion_producto_preparado_materia_prima[] @relation("ingredientesUsadosComoPreparado")
+  detalle_ventas              detalle_ventas[]
+  lote_productos              lote_productos[]
+  movimientos_inventario      movimientos_inventario[]
+  categoria                   categorias                                    @relation(fields: [id_categoria], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  marca                       marcas?                                       @relation(fields: [id_marca], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_productos_marcas")
+  unidades_medida             unidades_medida                               @relation("productos_unidades_medida", fields: [id_unidad_medida], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model ventas {
@@ -133,28 +125,27 @@ model ventas {
   nit                  Int?
   nombre               String?          @db.VarChar(255)
   usuario_creacion     Int
-  fecha_creacion       DateTime         @db.Timestamp(6)
+  fecha_creacion       DateTime         @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
   fecha_modificacion   DateTime?        @db.Timestamp(6)
-  estado               Int              @db.SmallInt
+  estado               Int              @default(1) @db.SmallInt
   detalle_ventas       detalle_ventas[]
   devoluciones         devoluciones[]
   pagos                pagos[]
 }
 
 model asignacion_combos_productos {
-  id               Int             @id @default(autoincrement())
-  id_combo         Int
-  cantidad         Int
-  id_producto      Int
-  id_lote_producto Int?
-  lote_productos   lote_productos? @relation(fields: [id_lote_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_prep_lote_productos1")
-  combos           combos          @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_prep_combos1")
-  productos        productos       @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_productos1")
-
-  @@index([id_lote_producto], map: "fk_asignacion_combos_productos_lote_productos1_idx")
-  @@index([id_combo], map: "fk_asignacion_combos_productos_prep_combos1_idx")
-  @@index([id_producto], map: "fk_asignacion_combos_productos_productos1_idx")
+  id                   Int       @id @default(autoincrement())
+  id_combo             Int
+  cantidad             Int
+  id_producto          Int
+  usuario_creacion     Int
+  fecha_creacion       DateTime  @default(now()) @db.Timestamp(6)
+  usuario_modificacion Int?
+  fecha_modificacion   DateTime? @db.Timestamp(6)
+  estado               Int       @default(1) @db.SmallInt
+  combos               combos    @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_prep_combos1")
+  productos            productos @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_productos1")
 }
 
 model combos {
@@ -163,63 +154,96 @@ model combos {
   nombre                      String                        @db.VarChar(45)
   precio_final                Decimal                       @db.Decimal(18, 2)
   usuario_creacion            Int
-  fecha_creacion              DateTime                      @db.Timestamp(6)
+  fecha_creacion              DateTime                      @default(now()) @db.Timestamp(6)
   usuario_modificacion        Int?
   fecha_modificacion          DateTime?                     @db.Timestamp(6)
-  estado                      Int                           @db.SmallInt
+  estado                      Int                           @default(1) @db.SmallInt
   asignacion_combos_productos asignacion_combos_productos[]
+  detalle_ventas              detalle_ventas[]
 }
 
 model devoluciones_detalle {
-  id_detalle       Int            @id @default(autoincrement())
-  cantidad         Int
-  monto_reembolso  Decimal        @db.Decimal(10, 2)
-  id_devolucione   Int
-  id_detalle_venta Int
-  detalle_ventas   detalle_ventas @relation(fields: [id_detalle_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_devoluciones_detalle_detalle_ventas1")
-  devoluciones     devoluciones   @relation(fields: [id_devolucione], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_devoluciones_detalle_devoluciones1")
-
-  @@index([id_detalle_venta], map: "fk_devoluciones_detalle_detalle_ventas1_idx")
-  @@index([id_devolucione], map: "fk_devoluciones_detalle_devoluciones1_idx")
-}
-
-model recetas {
-  id                              Int                               @id @default(autoincrement())
-  nombre                          String                            @db.VarChar(45)
-  usuario_creacion                Int
-  fecha_creacion                  DateTime                          @db.Timestamp(6)
-  usuario_modificacion            Int?
-  fecha_modificacion              DateTime?                         @db.Timestamp(6)
-  estado                          Int                               @db.SmallInt
-  asignacion_receta_materia_prima asignacion_receta_materia_prima[]
-  productos                       productos[]
-}
-
-model asignacion_receta_materia_prima {
-  id_producto          Int
-  id_receta            Int
-  unidad_medida        String    @db.VarChar(45)
-  cantidad_requerida   Int
+  id_detalle           Int            @id @default(autoincrement())
+  cantidad             Int
+  monto_reembolso      Decimal        @db.Decimal(10, 2)
+  id_devolucion        Int
+  id_detalle_venta     Int
   usuario_creacion     Int
-  fecha_creacion       DateTime  @db.Timestamp(6)
+  fecha_creacion       DateTime       @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
-  fecha_modificacion   DateTime? @db.Timestamp(6)
-  estado               Int       @db.SmallInt
-  productos            productos @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_recetas_productos_productos1")
-  recetas              recetas   @relation(fields: [id_receta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_recetas_productos_recetas1")
-
-  @@id([id_producto, id_receta])
-  @@index([id_producto], map: "fk_asignacion_recetas_productos_productos1_idx")
-  @@index([id_receta], map: "fk_asignacion_recetas_productos_recetas1_idx")
+  fecha_modificacion   DateTime?      @db.Timestamp(6)
+  estado               Int            @default(1) @db.SmallInt
+  detalle_ventas       detalle_ventas @relation(fields: [id_detalle_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_devoluciones_detalle_detalle_ventas1")
+  devoluciones         devoluciones   @relation(fields: [id_devolucion], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model categoria {
-  id                   Int         @id
-  name                 String      @db.VarChar(45)
+model alertas_stock {
+  id           Int       @id @default(autoincrement())
+  id_producto  Int
+  stock_actual Int
+  stock_minimo Int
+  fecha_alerta DateTime  @default(now()) @db.Timestamp(6)
+  atendida     Boolean   @default(false)
+  productos    productos @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model movimientos_inventario {
+  id                   Int             @id @default(autoincrement())
+  id_producto          Int
+  id_lote              Int?
+  tipo_movimiento      String          @db.VarChar(20)
+  cantidad             Int
+  descripcion          String?
   usuario_creacion     Int
-  fecha_creacion       DateTime    @db.Timestamp(6)
-  usuario_modificacion String?     @db.VarChar(45)
+  fecha_creacion       DateTime        @default(now()) @db.Timestamp(6)
+  usuario_modificacion Int?
+  fecha_modificacion   DateTime?       @db.Timestamp(6)
+  estado               Int             @default(1) @db.SmallInt
+  lote_productos       lote_productos? @relation(fields: [id_lote], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productos            productos       @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model categorias {
+  id                   Int         @id @default(autoincrement())
+  nombre               String      @db.VarChar(45)
+  descripcion          String?
+  usuario_creacion     Int
+  fecha_creacion       DateTime    @default(now()) @db.Timestamp(6)
+  usuario_modificacion Int?
   fecha_modificacion   DateTime?   @db.Timestamp(6)
-  estado               Int         @db.SmallInt
+  estado               Int         @default(1) @db.SmallInt
   productos            productos[]
+}
+
+model asignacion_producto_preparado_materia_prima {
+  id                        Int       @id @default(autoincrement())
+  id_producto_preparado     Int
+  id_producto_materia_prima Int
+  cantidad_requerida        Int
+  usuario_creacion          Int
+  fecha_creacion            DateTime  @db.Timestamp(6)
+  usuario_modificacion      Int?
+  fecha_modificacion        DateTime? @db.Timestamp(6)
+  estado                    Int       @default(1) @db.SmallInt
+  productoMateriaPrima      productos @relation("ingredientesUsadosComoMateriaPrima", fields: [id_producto_materia_prima], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "asignacion_producto_preparado_ma_id_producto_materia_prima_fkey")
+  productoPreparado         productos @relation("ingredientesUsadosComoPreparado", fields: [id_producto_preparado], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "asignacion_producto_preparado_materi_id_producto_preparado_fkey")
+}
+
+model unidades_medida {
+  id                   Int         @id @default(autoincrement())
+  nombre               String      @unique @db.VarChar(50)
+  abreviatura          String      @db.VarChar(10)
+  descripcion          String?
+  estado               Int         @default(1) @db.SmallInt
+  usuario_creacion     Int
+  fecha_creacion       DateTime    @default(now()) @db.Timestamp(6)
+  usuario_modificacion Int?
+  fecha_modificacion   DateTime?   @db.Timestamp(6)
+  productos            productos[] @relation("productos_unidades_medida")
+}
+
+enum tipo_producto_enum {
+  FINAL
+  PREPARADO
 }
