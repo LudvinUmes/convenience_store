@@ -20,7 +20,6 @@ export class ProductosController {
     return await this.productosService.getAllProducts();
   }
 
-  // Obtener Producto por ID
   @Get(':id')
   async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Producto> {
     return await this.productosService.getById(id);
@@ -42,7 +41,9 @@ export class ProductosController {
   }
 
   @Delete(':id')
-  async eliminarProducto(@Param('id', ParseIntPipe) id: number): Promise<Producto> {
+  async eliminarProducto(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Producto> {
     return await this.productosService.deleteProduct(id);
   }
 }

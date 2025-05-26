@@ -7,7 +7,14 @@ export class ProductosService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllProducts(): Promise<Producto[]> {
-    return await this.prisma.productos.findMany();
+    return await this.prisma.productos.findMany({
+      include: {
+        categoria: true,
+        marca: true,
+      },
+      where: { estado: 1 },
+      orderBy: { id: 'asc' },
+    });
   }
 
   async getById(id: number): Promise<Producto> {
@@ -38,7 +45,7 @@ export class ProductosService {
   }
 
   async deleteProduct(id: number): Promise<Producto> {
-    await this.getById(id); 
+    await this.getById(id);
     return await this.prisma.productos.update({
       where: { id },
       data: { estado: 0 },
