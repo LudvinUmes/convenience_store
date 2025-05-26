@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE ingreso_lote(
+CREATE OR REPLACE PROCEDURE sp_ingreso_lote(
   p_id_producto INT,
   p_costo_unitario NUMERIC(20,2),
   p_precio_lote NUMERIC(10,2),

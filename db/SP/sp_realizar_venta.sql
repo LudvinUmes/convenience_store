@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE realizarVenta(
+CREATE OR REPLACE PROCEDURE sp_realizar_venta(
   p_fecha_venta TIMESTAMP,
   p_total DECIMAL(18,2),
   p_observaciones TEXT,

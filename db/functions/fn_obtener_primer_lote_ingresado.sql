@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION obtenerPrimerLoteIngresado(idProducto INT)
+CREATE OR REPLACE FUNCTION fn_obtener_primer_lote_ingresado(idProducto INT)
 RETURNS TABLE (
   id_lote INT,
   costo_unitario NUMERIC(20,2),

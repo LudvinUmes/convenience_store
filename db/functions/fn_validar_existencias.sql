@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION validarExistencias(p_id_producto INT) 
+CREATE OR REPLACE FUNCTION fn_validar_existencias(p_id_producto INT) 
 RETURNS INT AS $$
 DECLARE
   existencias INT;

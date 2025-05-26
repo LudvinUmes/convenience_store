@@ -1,7 +1,7 @@
 -- -----------------------------------------------------
 -- Function obtenerTipoProducto
 -- -----------------------------------------------------
-CREATE OR REPLACE FUNCTION obtenerTipoProducto(p_id_producto INT) 
+CREATE OR REPLACE FUNCTION fn_obtener_tipo_producto(p_id_producto INT) 
 RETURNS TABLE(nombre_tipo TEXT) AS $$
 BEGIN
     RETURN QUERY

@@ -1,7 +1,7 @@
 -- -----------------------------------------------------
 -- Function existenteEnCombo
 -- -----------------------------------------------------
-CREATE OR REPLACE FUNCTION existenteEnCombo(p_id_producto INT) 
+CREATE OR REPLACE FUNCTION fn_existente_en_combo(p_id_producto INT) 
 RETURNS BOOLEAN AS $$
 BEGIN
     RETURN EXISTS (
