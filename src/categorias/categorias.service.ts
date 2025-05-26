@@ -1,48 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { categoria as Categorias, Prisma } from '@prisma/client';
+import { categorias as Categoria, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CategoriasService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: Prisma.categoriaCreateInput): Promise<Categorias> {
-    const prismaAny = this.prisma as any;
-    return prismaAny.categoria.create({
+  async create(data: Prisma.categoriasCreateInput): Promise<Categoria> {
+    return await this.prisma.categorias.create({
       data,
     });
   }
 
-  async findAll(): Promise<Categorias[]> {
-    const prismaAny = this.prisma as any;
-    return prismaAny.categoria.findMany({
+  async findAll(): Promise<Categoria[]> {
+    return this.prisma.categorias.findMany({
       include: {
         productos: true,
+      },
+      where: {
+        estado: 1, // Solo categorías activas
       },
     });
   }
 
-  async findOne(id: number): Promise<Categorias> {
-    const prismaAny = this.prisma as any;
-    return prismaAny.categoria.findUnique({
-      where: { id },
-      include: {
-        productos: true,
-      },
-    });
+  async findOne(id: number): Promise<Categoria> {
+    return (
+      (await this.prisma.categorias.findUnique({
+        where: { id, estado: 1 }, // Solo categorías activas
+      })) ?? Promise.reject(new Error('Categoría no encontrada'))
+    );
   }
 
-  async update(id: number, data: Prisma.categoriaUpdateInput): Promise<Categorias> {
-    const prismaAny = this.prisma as any;
-    return prismaAny.categoria.update({
+  async update(
+    id: number,
+    data: Prisma.categoriasUpdateInput,
+  ): Promise<Categoria> {
+    return await this.prisma.categorias.update({
       where: { id },
       data,
     });
   }
 
-  async remove(id: number): Promise<Categorias> {
-    const prismaAny = this.prisma as any;
-    return prismaAny.categoria.delete({
+  async remove(id: number): Promise<Categoria> {
+    return await this.prisma.categorias.delete({
       where: { id },
     });
   }
