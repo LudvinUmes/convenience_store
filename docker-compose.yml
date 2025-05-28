@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: tienda-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: nestpass
+      POSTGRES_DB: tienda_conveniencia
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    container_name: tienda-app
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:nestpass@postgres:5432/tienda_conveniencia
+    ports:
+      - '3003:3003'
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+
+volumes:
+  pgdata:
