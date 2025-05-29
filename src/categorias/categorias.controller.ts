@@ -9,18 +9,26 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { CategoriasService } from './categorias.service';
-import { categorias as Categoria, Prisma } from '@prisma/client';
+import { categorias as Categoria } from '@prisma/client';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CreateCategoriaDto } from './dto/create-categoria.dto';
+import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 
+@ApiTags('Categorías')
 @Controller('categorias')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Obtener todas las categorías' })
+  @ApiResponse({ status: 200, description: 'Listado de categorías' })
   async obtenerTodos(): Promise<Categoria[]> {
     return await this.categoriasService.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener categoría por ID' })
+  @ApiResponse({ status: 200, description: 'Categoría encontrada' })
   async obtenerPorId(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Categoria> {
@@ -28,19 +36,25 @@ export class CategoriasController {
   }
 
   @Post()
-  async crear(@Body() data: Prisma.categoriasCreateInput): Promise<Categoria> {
+  @ApiOperation({ summary: 'Crear una nueva categoría' })
+  @ApiResponse({ status: 201, description: 'Categoría creada' })
+  async crear(@Body() data: CreateCategoriaDto): Promise<Categoria> {
     return await this.categoriasService.create(data);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Actualizar una categoría existente' })
+  @ApiResponse({ status: 200, description: 'Categoría actualizada' })
   async actualizar(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: Prisma.categoriasCreateInput,
+    @Body() data: UpdateCategoriaDto,
   ): Promise<Categoria> {
     return await this.categoriasService.update(id, data);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar una categoría (lógicamente)' })
+  @ApiResponse({ status: 200, description: 'Categoría eliminada' })
   async eliminar(@Param('id', ParseIntPipe) id: number): Promise<Categoria> {
     return await this.categoriasService.remove(id);
   }
