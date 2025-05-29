@@ -6,7 +6,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class DetalleVentaDto {
@@ -16,6 +16,7 @@ class DetalleVentaDto {
   })
   @IsOptional()
   @IsInt()
+  @Transform(({ value }) => (value === 0 ? null : value)) // CLAVE: Convertir 0 a null
   id_producto?: number;
 
   @ApiPropertyOptional({
@@ -23,35 +24,26 @@ class DetalleVentaDto {
   })
   @IsOptional()
   @IsInt()
+  @Transform(({ value }) => (value === 0 ? null : value)) // CLAVE: Convertir 0 a null
   id_combo?: number;
 
   @ApiProperty({ example: 3, description: 'Cantidad de unidades vendidas' })
   @IsInt()
   cantidad!: number;
-
-  @ApiProperty({
-    example: 2.5,
-    description: 'Precio unitario aplicado a este ítem',
-  })
-  @IsNumber()
-  precio_unitario!: number;
 }
 
 class PagoDto {
-  @ApiProperty({ example: 'Efectivo', description: 'Método de pago utilizado' })
+  @ApiProperty({ example: 'EFECTIVO', description: 'Método de pago utilizado' })
   @IsString()
   metodo_pago!: string;
 
-  @ApiProperty({ example: 7.5, description: 'Monto pagado con este método' })
+  // CORREGIDO: En los ejemplos del SP, monto es 0, sugiere que se calcula automáticamente
+  @ApiProperty({ example: 0, description: 'Monto pagado con este método' })
   @IsNumber()
   monto!: number;
 }
 
 export class RegistrarVentaDto {
-  @ApiProperty({ example: 7.5, description: 'Total de la venta' })
-  @IsNumber()
-  total!: number;
-
   @ApiProperty({ example: 'COMPLETADA', description: 'Estado de la venta' })
   @IsString()
   estado_venta!: string;
@@ -65,12 +57,12 @@ export class RegistrarVentaDto {
   observaciones?: string;
 
   @ApiPropertyOptional({
-    example: 12345678,
+    example: '1234567-0',
     description: 'NIT del cliente (opcional)',
   })
   @IsOptional()
-  @IsInt()
-  nit?: number;
+  @IsString()
+  nit?: string;
 
   @ApiPropertyOptional({
     example: 'Carlos Pérez',

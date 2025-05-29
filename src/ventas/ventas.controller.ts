@@ -9,7 +9,10 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { VentasService } from './ventas.service';
-import { ventas as Ventas, Prisma } from '@prisma/client';
+import { ventas as Ventas } from '@prisma/client';
+import { ApiOperation } from '@nestjs/swagger';
+import { RegistrarVentaDto } from './dto/registrar-venta.dto';
+import { UpdateVentaDto } from './dto/update-venta.dto';
 
 /**
  * Controlador para gestionar todas las operaciones de ventas de la tienda.
@@ -22,7 +25,7 @@ export class VentasController {
   /**
    * Obtiene el historial de ventas activas.
    * Por defecto solo muestra las ventas con estado = 1 (activas).
-   * 
+   *
    * @returns Lista de todas las ventas activas
    */
   @Get()
@@ -33,7 +36,7 @@ export class VentasController {
   /**
    * Obtiene el historial completo de ventas, incluyendo activas e inactivas.
    * Útil para auditorías y revisiones históricas completas.
-   * 
+   *
    * @returns Lista completa de todas las ventas registradas
    */
   @Get('completo')
@@ -47,9 +50,7 @@ export class VentasController {
    * @return es la informacion completa de la venta solicitada
    */
   @Get(':id')
-  async obtenerPorId(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Ventas> {
+  async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Ventas> {
     return await this.ventasService.getVentasbyId(id);
   }
 
@@ -58,11 +59,12 @@ export class VentasController {
    * @param ventaData son los datos necesarios para crear la venta
    * @return es la venta recién creada con su ID asignado
    */
-  @Post()
-  async crearVenta(
-    @Body() ventaData: Prisma.ventasCreateInput,
-  ): Promise<Ventas> {
-    return await this.ventasService.crearVentas(ventaData);
+  @Post('')
+  @ApiOperation({
+    summary: 'Registrar una venta completa y procesar inventario + alertas',
+  })
+  async registrarVentaCompleta(@Body() data: RegistrarVentaDto) {
+    return this.ventasService.registrarVentaCompleta(data);
   }
 
   /**
@@ -74,23 +76,36 @@ export class VentasController {
   @Put(':id')
   async actualizarVenta(
     @Param('id', ParseIntPipe) id: number,
-    @Body() ventaData: Prisma.ventasUpdateInput,
+    @Body() ventaData: UpdateVentaDto,
   ): Promise<Ventas> {
-    return await this.ventasService.updateVenta(id, ventaData);
+    // Validar que la venta exista
+    await this.obtenerPorId(ventaData.id_venta);
+
+    // Actualizar cabecera si hay cambios
+    await this.ventasService.updateVenta(id, ventaData);
+
+    if (
+      ventaData.estado_venta?.toUpperCase() === 'ANULADA' ||
+      ventaData.estado_venta === '2'
+    ) {
+      await this.ventasService.marcarDetalleComoDevuelto(
+        id,
+        ventaData.usuario_modificacion,
+      );
+    }
+
+    return this.obtenerPorId(id);
   }
 
   /**
    * Desactiva una venta en el sistema sin eliminarla realmente.
    * Cambia el estado de la venta a 0 (inactiva) para mantener el historial completo.
-   * 
+   *
    * el @param id es el identificador de la venta a desactivar
    * @return es la venta que fue desactivada con su estado actualizado
    */
   @Delete(':id')
-  async eliminarVenta(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Ventas> {
+  async eliminarVenta(@Param('id', ParseIntPipe) id: number): Promise<Ventas> {
     return await this.ventasService.deleteVenta(id);
   }
 }
-
