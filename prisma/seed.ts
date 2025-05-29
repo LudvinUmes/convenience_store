@@ -177,6 +177,59 @@ async function main() {
   });
 
   console.log('🌭 Hot Dog Clásico y sus ingredientes creados exitosamente');
+
+  // 7. Crear combos
+  const combo1 = await prisma.combos.create({
+    data: {
+      nombre: 'Combo Hot Dog Clásico x2',
+      descripcion: 'Incluye 2 hot dogs clásicos y 2 bebidas pequeñas',
+      precio_final: 6.0,
+      usuario_creacion: 1,
+    },
+  });
+
+  const combo2 = await prisma.combos.create({
+    data: {
+      nombre: 'Combo Hot Dog + Papas',
+      descripcion: 'Hot dog clásico acompañado con papas fritas',
+      precio_final: 5,
+      usuario_creacion: 1,
+    },
+  });
+
+  console.log('🍟 Combos creados exitosamente');
+
+  // 8. Asignar productos a los combos
+  await prisma.asignacion_combos_productos.createMany({
+    data: [
+      {
+        id_combo: combo1.id,
+        id_producto: hotDog.id, // Asegúrate que hotDog ya esté definido
+        cantidad: 2,
+        usuario_creacion: 1,
+        fecha_creacion: new Date(),
+        precio_unitario_descuento: 3.0, // Precio unitario del hot dog
+      },
+      {
+        id_combo: combo2.id,
+        id_producto: hotDog.id,
+        cantidad: 1,
+        usuario_creacion: 1,
+        fecha_creacion: new Date(),
+        precio_unitario_descuento: 2.5, // Precio unitario del hot dog
+      },
+      {
+        id_combo: combo2.id,
+        id_producto: hotDog.id, // Reemplaza con el ID real de papas fritas cuando lo tengas
+        cantidad: 1,
+        usuario_creacion: 1,
+        fecha_creacion: new Date(),
+        precio_unitario_descuento: 2.5, // Precio unitario de las papas fritas
+      },
+    ],
+  });
+
+  console.log('🍔 Productos asignados a los combos exitosamente');
 }
 
 main()

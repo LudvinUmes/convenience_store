@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "ventas" ALTER COLUMN "nit" SET DATA TYPE TEXT;

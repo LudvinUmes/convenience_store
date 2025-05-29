@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -9,24 +9,26 @@ datasource db {
 }
 
 model detalle_ventas {
-  id                   Int                    @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   id_venta             Int
   cantidad             Int
-  precio_unitario      Decimal                @db.Decimal(18, 2)
-  subtotal             Decimal                @db.Decimal(18, 2)
-  descuento            Decimal?               @db.Decimal(18, 2)
-  id_producto          Int
+  precio_unitario      Decimal   @db.Decimal(18, 2)
+  subtotal             Decimal   @db.Decimal(18, 2)
+  descuento            Decimal?  @db.Decimal(18, 2)
+  id_producto          Int // Ya NO es opcional
   id_lote_producto     Int?
   id_combo             Int?
   usuario_creacion     Int
-  fecha_creacion       DateTime               @default(now()) @db.Timestamp(6)
+  fecha_creacion       DateTime  @default(now()) @db.Timestamp(6)
   usuario_modificacion Int?
-  fecha_modificacion   DateTime?              @db.Timestamp(6)
-  estado               Int                    @default(1) @db.SmallInt
-  combos               combos?                @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  lote_productos       lote_productos?        @relation(fields: [id_lote_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_lote")
-  productos            productos              @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_productos1")
-  ventas               ventas                 @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_venta")
+  fecha_modificacion   DateTime? @db.Timestamp(6)
+  estado               Int       @default(1) @db.SmallInt
+
+  combos         combos?         @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lote_productos lote_productos? @relation(fields: [id_lote_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_lote")
+  productos      productos       @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_productos1") // Ya NO es opcional
+  ventas         ventas          @relation(fields: [id_venta], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_detalle_ventas_venta")
+
   devoluciones_detalle devoluciones_detalle[]
 }
 
@@ -119,11 +121,11 @@ model productos {
 
 model ventas {
   id                   Int              @id @default(autoincrement())
-  fecha_venta          DateTime         @db.Timestamp(6)
+  fecha_venta          DateTime         @default(now()) @db.Timestamp(6)
   total                Decimal          @db.Decimal(18, 2)
   estado_venta         String           @db.VarChar(20)
   observaciones        String?
-  nit                  Int?
+  nit                  String?
   nombre               String?          @db.VarChar(255)
   usuario_creacion     Int
   fecha_creacion       DateTime         @default(now()) @db.Timestamp(6)
@@ -136,17 +138,19 @@ model ventas {
 }
 
 model asignacion_combos_productos {
-  id                   Int       @id @default(autoincrement())
-  id_combo             Int
-  cantidad             Int
-  id_producto          Int
-  usuario_creacion     Int
-  fecha_creacion       DateTime  @default(now()) @db.Timestamp(6)
-  usuario_modificacion Int?
-  fecha_modificacion   DateTime? @db.Timestamp(6)
-  estado               Int       @default(1) @db.SmallInt
-  combos               combos    @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_prep_combos1")
-  productos            productos @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_productos1")
+  id                        Int       @id @default(autoincrement())
+  id_combo                  Int
+  cantidad                  Int
+  id_producto               Int
+  precio_unitario_descuento Decimal   @db.Decimal(18, 2)
+  usuario_creacion          Int
+  fecha_creacion            DateTime  @default(now()) @db.Timestamp(6)
+  usuario_modificacion      Int?
+  fecha_modificacion        DateTime? @db.Timestamp(6)
+  estado                    Int       @default(1) @db.SmallInt
+
+  combos    combos    @relation(fields: [id_combo], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_prep_combos1")
+  productos productos @relation(fields: [id_producto], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_asignacion_combos_productos_productos1")
 }
 
 model combos {
