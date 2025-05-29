@@ -3,10 +3,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductosModule } from './productos/productos.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { MarcasModule } from './marcas/marcas.module';
-import { Lote_productosModule } from './lotes/lotes.module';
 import { VentasModule } from './ventas/ventas.module';
 import { DevolucionesModule } from './devoluciones/devoluciones.module';
 import { RecetasModule } from './recetas/recetas.module';
+import { LotesModule } from './lotes/lotes.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { RecetasModule } from './recetas/recetas.module';
     ProductosModule,
     CategoriasModule,
     MarcasModule,
-    Lote_productosModule,
+    LotesModule,
     VentasModule,
     DevolucionesModule,
     RecetasModule,

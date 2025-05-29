@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { lote_productosService } from './lotes.service';
-import { Lote_productosController } from './lotes.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { LotesController } from './lotes.controller';
+import { LotesService } from './lotes.service';
 
 @Module({
-  providers: [lote_productosService],
-  controllers: [Lote_productosController],
+  providers: [LotesService],
+  controllers: [LotesController],
   imports: [PrismaModule],
 })
-export class Lote_productosModule {}
+export class LotesModule {}
