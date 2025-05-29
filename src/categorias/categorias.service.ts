@@ -38,6 +38,7 @@ export class CategoriasService {
   }
 
   async update(id: number, data: UpdateCategoriaDto): Promise<Categoria> {
+    await this.findOne(id); // Verificar si la categoría existe
     return this.prisma.categorias.update({
       where: { id },
       data: {
