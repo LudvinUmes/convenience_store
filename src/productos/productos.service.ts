@@ -44,6 +44,23 @@ export class ProductosService {
   async getById(id: number): Promise<Producto> {
     const product = await this.prisma.productos.findUnique({
       where: { id },
+      include: {
+        categoria: true,
+        marca: true,
+        preparadoComoProductoFinal: {
+          include: {
+            productoMateriaPrima: {
+              select: {
+                id: true,
+                nombre: true,
+                descripcion: true,
+                precio_referencia: true,
+                unidades_medida: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!product) {
       throw new NotFoundException(`Producto con ID ${id} no encontrado`);
