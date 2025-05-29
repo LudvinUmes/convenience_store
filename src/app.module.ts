@@ -6,6 +6,7 @@ import { MarcasModule } from './marcas/marcas.module';
 import { Lote_productosModule } from './lotes/lotes.module';
 import { VentasModule } from './ventas/ventas.module';
 import { DevolucionesModule } from './devoluciones/devoluciones.module';
+import { RecetasModule } from './recetas/recetas.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DevolucionesModule } from './devoluciones/devoluciones.module';
     Lote_productosModule,
     VentasModule,
     DevolucionesModule,
+    RecetasModule,
   ],
   controllers: [],
   providers: [],
