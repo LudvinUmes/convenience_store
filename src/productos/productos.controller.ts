@@ -23,7 +23,7 @@ export class ProductosController {
   @ApiQuery({ name: 'tipo', required: false, enum: ['FINAL', 'PREPARADO'] })
   @ApiQuery({ name: 'id_categoria', required: false, type: Number })
   @ApiQuery({ name: 'es_materia_prima', required: false, type: Boolean })
-  @Get()
+  @Get('GET')
   async obtenerProductos(
     @Query('tipo') tipo?: 'FINAL' | 'PREPARADO',
     @Query('id_categoria') id_categoria?: number,
@@ -41,19 +41,19 @@ export class ProductosController {
     });
   }
 
-  @Get(':id')
+  @Get('GET/:id')
   async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Producto> {
     return await this.productosService.getById(id);
   }
 
-  @Post()
+  @Post('POST')
   async crearProducto(
     @Body() productoData: CreateProductoDto,
   ): Promise<Producto> {
     return await this.productosService.createProduct(productoData);
   }
 
-  @Put(':id')
+  @Put('PUT/:id')
   async actualizarProducto(
     @Param('id', ParseIntPipe) id: number,
     @Body() productoData: UpdateProductoDto,
@@ -61,7 +61,7 @@ export class ProductosController {
     return await this.productosService.updateProduct(id, productoData);
   }
 
-  @Delete(':id')
+  @Delete('DELETE/:id')
   async eliminarProducto(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Producto> {

@@ -28,7 +28,7 @@ export class VentasController {
    *
    * @returns Lista de todas las ventas activas
    */
-  @Get()
+  @Get('GET')
   async obtenerVentas(): Promise<Ventas[]> {
     return await this.ventasService.getAllVentas();
   }
@@ -39,7 +39,7 @@ export class VentasController {
    *
    * @returns Lista completa de todas las ventas registradas
    */
-  @Get('completo')
+  @Get('GET/completo')
   async obtenerVentasCompleto(): Promise<Ventas[]> {
     return await this.ventasService.getAllVentasCompleto();
   }
@@ -49,7 +49,7 @@ export class VentasController {
    * El @param es el id de la venta
    * @return es la informacion completa de la venta solicitada
    */
-  @Get(':id')
+  @Get('GET/:id')
   async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Ventas> {
     return await this.ventasService.getVentasbyId(id);
   }
@@ -59,7 +59,7 @@ export class VentasController {
    * @param ventaData son los datos necesarios para crear la venta
    * @return es la venta recién creada con su ID asignado
    */
-  @Post('')
+  @Post('POST')
   @ApiOperation({
     summary: 'Registrar una venta completa y procesar inventario + alertas',
   })
@@ -73,7 +73,7 @@ export class VentasController {
    * @param ventaData son los nuevos datos para actualizar la venta
    * @return es la venta con la informacion actualizada
    */
-  @Put(':id')
+  @Put('PUT/:id')
   async actualizarVenta(
     @Param('id', ParseIntPipe) id: number,
     @Body() ventaData: UpdateVentaDto,
@@ -104,7 +104,7 @@ export class VentasController {
    * el @param id es el identificador de la venta a desactivar
    * @return es la venta que fue desactivada con su estado actualizado
    */
-  @Delete(':id')
+  @Delete('DELETE/:id')
   async eliminarVenta(@Param('id', ParseIntPipe) id: number): Promise<Ventas> {
     return await this.ventasService.deleteVenta(id);
   }
