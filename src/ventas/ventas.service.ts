@@ -19,7 +19,7 @@ export class VentasService {
    * @param data son los datos necesarios para crear la venta
    * @returns La venta recién creada con su ID asignado
    */
-  async registrarVentaCompleta(data: RegistrarVentaDto): Promise<string> {
+  async registrarVentaCompleta(data: RegistrarVentaDto): Promise<any> {
     try {
       console.log('=== INICIANDO REGISTRO DE VENTA ===');
       console.log('Datos recibidos:', JSON.stringify(data, null, 2));
@@ -89,7 +89,9 @@ export class VentasService {
         // Aquí podrías usar HttpService de NestJS para hacer un POST real
       });
 
-      return 'Venta registrada exitosamente y alertas procesadas';
+      return {
+        message: 'Venta registrada exitosamente y alertas procesadas',
+      };
     } catch (error: any) {
       console.error('=== ERROR EN REGISTRO DE VENTA ===');
       console.error('Error completo:', error);

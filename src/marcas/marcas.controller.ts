@@ -14,7 +14,7 @@ import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@Controller('marcas')
+@Controller('tienda-conveniencia/marcas')
 export class MarcasController {
   constructor(private readonly marcasService: marcasService) {}
 

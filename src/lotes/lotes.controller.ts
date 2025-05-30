@@ -14,7 +14,7 @@ import { CreateLoteDto } from './dto/create-lote.dto';
 import { UpdateLoteDto } from './dto/update-lote.dto';
 
 @ApiTags('Lotes')
-@Controller('lotes')
+@Controller('tienda-conveniencia/lotes')
 export class LotesController {
   constructor(private readonly lotesService: LotesService) {}
 

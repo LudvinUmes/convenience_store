@@ -16,7 +16,7 @@ import { UpdateCantidadDto } from './dto/update-cantidad-ingrediente.dto';
 import { RecetasService } from './recetas.service';
 
 @ApiTags('Recetas')
-@Controller('recetas')
+@Controller('tienda-conveniencia/recetas')
 export class RecetasController {
   constructor(private readonly recetasService: RecetasService) {}
 

@@ -18,7 +18,7 @@ import { UpdateVentaDto } from './dto/update-venta.dto';
  * Controlador para gestionar todas las operaciones de ventas de la tienda.
  * Permite registrar, consultar, modificar y eliminar transacciones.
  */
-@Controller('ventas')
+@Controller('tienda-conveniencia/ventas')
 export class VentasController {
   constructor(private readonly ventasService: VentasService) {}
 
@@ -79,7 +79,7 @@ export class VentasController {
     @Body() ventaData: UpdateVentaDto,
   ): Promise<Ventas> {
     // Validar que la venta exista
-    await this.obtenerPorId(ventaData.id_venta);
+    await this.obtenerPorId(id);
 
     // Actualizar cabecera si hay cambios
     await this.ventasService.updateVenta(id, ventaData);
