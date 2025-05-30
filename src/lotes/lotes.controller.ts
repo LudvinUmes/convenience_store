@@ -14,11 +14,11 @@ import { CreateLoteDto } from './dto/create-lote.dto';
 import { UpdateLoteDto } from './dto/update-lote.dto';
 
 @ApiTags('Lotes')
-@Controller('tienda-conveniencia/lotes')
+@Controller('')
 export class LotesController {
   constructor(private readonly lotesService: LotesService) {}
 
-  @Post('POST')
+  @Post('POST/lotes')
   @ApiOperation({
     summary: 'Registrar nuevo lote (y movimiento de inventario)',
   })
@@ -27,14 +27,14 @@ export class LotesController {
     return this.lotesService.crearLote(data);
   }
 
-  @Get('GET')
+  @Get('GET/lotes')
   @ApiOperation({ summary: 'Listar lotes activos con stock disponible' })
   @ApiResponse({ status: 200, description: 'Lista de lotes activos' })
   async obtenerTodos() {
     return this.lotesService.obtenerLotesActivos();
   }
 
-  @Get('GET/producto/:idProducto')
+  @Get('GET/lotes/producto/:idProducto')
   @ApiOperation({ summary: 'Obtener lotes por ID de producto' })
   @ApiParam({
     name: 'idProducto',
@@ -46,7 +46,7 @@ export class LotesController {
     return this.lotesService.obtenerLotePorIdProducto(id);
   }
 
-  @Get('GET/:id')
+  @Get('GET/lotes/:id')
   @ApiOperation({ summary: 'Obtener un lote por su ID' })
   @ApiParam({ name: 'id', type: Number, description: 'ID del lote' })
   @ApiResponse({ status: 200, description: 'Lote encontrado' })
@@ -54,7 +54,7 @@ export class LotesController {
     return this.lotesService.obtenerLotePorId(id);
   }
 
-  @Put('PUT/:id')
+  @Put('PUT/lotes/:id')
   @ApiOperation({ summary: 'Actualizar información de un lote' })
   @ApiParam({ name: 'id', type: Number, description: 'ID del lote' })
   @ApiResponse({ status: 200, description: 'Lote actualizado correctamente' })
@@ -65,7 +65,7 @@ export class LotesController {
     return this.lotesService.actualizarLote(id, data);
   }
 
-  @Delete('DELETE/:id')
+  @Delete('DELETE/lotes/:id')
   @ApiOperation({ summary: 'Inactivar un lote (eliminación lógica)' })
   @ApiParam({ name: 'id', type: Number, description: 'ID del lote' })
   @ApiResponse({ status: 200, description: 'Lote inactivado correctamente' })

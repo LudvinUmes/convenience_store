@@ -16,14 +16,14 @@ import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 
 @ApiTags('Productos')
-@Controller('tienda-conveniencia/productos')
+@Controller('')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
 
   @ApiQuery({ name: 'tipo', required: false, enum: ['FINAL', 'PREPARADO'] })
   @ApiQuery({ name: 'id_categoria', required: false, type: Number })
   @ApiQuery({ name: 'es_materia_prima', required: false, type: Boolean })
-  @Get('GET')
+  @Get('GET/productos')
   async obtenerProductos(
     @Query('tipo') tipo?: 'FINAL' | 'PREPARADO',
     @Query('id_categoria') id_categoria?: number,
@@ -41,19 +41,19 @@ export class ProductosController {
     });
   }
 
-  @Get('GET/:id')
+  @Get('GET/productos/:id')
   async obtenerPorId(@Param('id', ParseIntPipe) id: number): Promise<Producto> {
     return await this.productosService.getById(id);
   }
 
-  @Post('POST')
+  @Post('POST/productos')
   async crearProducto(
     @Body() productoData: CreateProductoDto,
   ): Promise<Producto> {
     return await this.productosService.createProduct(productoData);
   }
 
-  @Put('PUT/:id')
+  @Put('PUT/productos/:id')
   async actualizarProducto(
     @Param('id', ParseIntPipe) id: number,
     @Body() productoData: UpdateProductoDto,
@@ -61,7 +61,7 @@ export class ProductosController {
     return await this.productosService.updateProduct(id, productoData);
   }
 
-  @Delete('DELETE/:id')
+  @Delete('DELETE/productos/:id')
   async eliminarProducto(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Producto> {

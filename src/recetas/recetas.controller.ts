@@ -16,23 +16,23 @@ import { UpdateCantidadDto } from './dto/update-cantidad-ingrediente.dto';
 import { RecetasService } from './recetas.service';
 
 @ApiTags('Recetas')
-@Controller('tienda-conveniencia/recetas')
+@Controller('')
 export class RecetasController {
   constructor(private readonly recetasService: RecetasService) {}
 
-  @Get(':idProducto')
+  @Get('GET/recetas/:idProducto')
   @ApiOperation({ summary: 'Obtener receta de un producto preparado' })
   async obtenerReceta(@Param('idProducto', ParseIntPipe) id: number) {
     return this.recetasService.getRecetaPorProducto(id);
   }
 
-  @Post()
+  @Post('POST/recetas')
   @ApiOperation({ summary: 'Crear receta para un producto preparado' })
   async crearReceta(@Body() data: CreateRecetaDto) {
     return this.recetasService.crearReceta(data);
   }
 
-  @Put(':idProducto')
+  @Put('PUT/recetas/:idProducto')
   @ApiOperation({
     summary: 'Actualizar receta completa de un producto preparado',
   })
@@ -43,13 +43,13 @@ export class RecetasController {
     return this.recetasService.actualizarReceta(id, data);
   }
 
-  @Delete(':idAsignacion')
+  @Delete('DELETE/recetas/:idAsignacion')
   @ApiOperation({ summary: 'Eliminar ingrediente de la receta' })
   async eliminarIngrediente(@Param('idAsignacion', ParseIntPipe) id: number) {
     return this.recetasService.eliminarIngrediente(id);
   }
 
-  @Patch(':idAsignacion')
+  @Patch('PATCH/recetas/:idAsignacion')
   @ApiOperation({
     summary: 'Actualizar cantidad de un ingrediente en la receta',
   })
