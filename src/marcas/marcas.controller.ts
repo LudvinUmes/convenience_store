@@ -12,8 +12,9 @@ import { marcasService } from './marca.service';
 import { marcas as Marcas } from '@prisma/client';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Marcas')
 @Controller('')
 export class MarcasController {
   constructor(private readonly marcasService: marcasService) {}
