@@ -69,48 +69,83 @@ export class ProductosService {
   }
 
   async createProduct(data: CreateProductoDto): Promise<Producto> {
-    return await this.prisma.productos.create({
-      data: {
-        nombre: data.nombre,
-        descripcion: data.descripcion,
-        precio_referencia: new Prisma.Decimal(data.precio_referencia),
-        stock_minimo: data.stock_minimo,
-        tipo: data.tipo,
-        es_materia_prima: data.es_materia_prima,
-        receta: data.receta,
-        usuario_creacion: data.usuario_creacion,
+    try {
+      return await this.prisma.productos.create({
+        data: {
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio_referencia: new Prisma.Decimal(data.precio_referencia),
+          stock_minimo: data.stock_minimo,
+          tipo: data.tipo,
+          es_materia_prima: data.es_materia_prima,
+          receta: data.receta,
+          usuario_creacion: data.usuario_creacion,
 
-        categoria: {
-          connect: { id: data.id_categoria },
-        },
-        unidades_medida: {
-          connect: { id: data.id_unidad_medida },
-        },
-        ...(data.id_marca && {
-          marca: {
-            connect: { id: data.id_marca },
+          categoria: {
+            connect: { id: data.id_categoria },
           },
-        }),
-      },
-    });
+          unidades_medida: {
+            connect: { id: data.id_unidad_medida },
+          },
+          ...(data.id_marca && {
+            marca: {
+              connect: { id: data.id_marca },
+            },
+          }),
+        },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(
+          'Categoría, unidad de medida o marca no encontrada',
+        );
+      }
+      throw error;
+    }
   }
-
   async updateProduct(
     id: number,
     data: Prisma.productosUpdateInput,
   ): Promise<Producto> {
     await this.getById(id);
-    return await this.prisma.productos.update({
-      where: { id },
-      data,
-    });
+    try {
+      return await this.prisma.productos.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(
+          `Producto con ID ${id} no encontrado para actualizar`,
+        );
+      }
+      throw error;
+    }
   }
 
   async deleteProduct(id: number): Promise<Producto> {
     await this.getById(id);
-    return await this.prisma.productos.update({
-      where: { id },
-      data: { estado: 0 },
-    });
+    try {
+      return await this.prisma.productos.update({
+        where: { id },
+        data: { estado: 0 },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(
+          `Producto con ID ${id} no encontrado para eliminar`,
+        );
+      }
+      throw error;
+    }
   }
 }
