@@ -23,27 +23,56 @@ export class marcasService {
   }
 
   async create(data: Prisma.marcasCreateInput): Promise<Marcas> {
-    return await this.prisma.marcas.create({
-      data: { ...data, fecha_creacion: new Date(), estado: 1 },
-    });
+    try {
+      return await this.prisma.marcas.create({
+        data: { ...data, fecha_creacion: new Date(), estado: 1 },
+      });
+    } catch (error: any) {
+      // Handle unique constraint or other Prisma errors
+      if (error.code === 'P2002') {
+        throw new Error('Ya existe una marca con los mismos datos únicos.');
+      }
+      throw new Error('Error al crear la marca: ' + error.message);
+    }
   }
 
   async update(id: number, data: Prisma.marcasUpdateInput): Promise<Marcas> {
     await this.getById(id);
-    return await this.prisma.marcas.update({
-      where: { id },
-      data: {
-        ...data,
-        fecha_modificacion: new Date(),
-      },
-    });
+    try {
+      return await this.prisma.marcas.update({
+        where: { id },
+        data: {
+          ...data,
+          fecha_modificacion: new Date(),
+        },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new Error('Ya existe una marca con los mismos datos únicos.');
+      }
+      if (error.code === 'P2025') {
+        throw new NotFoundException(
+          `Marca con ID ${id} no encontrada para actualizar.`,
+        );
+      }
+      throw new Error('Error al actualizar la marca: ' + error.message);
+    }
   }
 
   async delete(id: number): Promise<Marcas> {
     await this.getById(id);
-    return await this.prisma.marcas.update({
-      where: { id },
-      data: { estado: 0 },
-    });
+    try {
+      return await this.prisma.marcas.update({
+        where: { id },
+        data: { estado: 0, fecha_modificacion: new Date() },
+      });
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        throw new NotFoundException(
+          `Marca con ID ${id} no encontrada para eliminar.`,
+        );
+      }
+      throw new Error('Error al eliminar la marca: ' + error.message);
+    }
   }
 }

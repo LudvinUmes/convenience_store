@@ -20,7 +20,7 @@ export class DevolucionesController {
 
   /**
    * Obtiene todas las devoluciones del sistema.
-   * 
+   *
    * @returns Lista de todas las devoluciones
    */
   @Get()

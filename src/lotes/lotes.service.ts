@@ -90,18 +90,38 @@ export class LotesService {
   }
 
   async actualizarLote(id: number, data: UpdateLoteDto) {
-    await this.obtenerLotePorId(id);
-    return this.prisma.lote_productos.update({
-      where: { id },
-      data,
-    });
+    try {
+      await this.obtenerLotePorId(id);
+      return await this.prisma.lote_productos.update({
+        where: { id },
+        data,
+      });
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Error al actualizar el lote',
+        error.message,
+      );
+    }
   }
 
   async inactivarLote(id: number) {
-    await this.obtenerLotePorId(id);
-    return this.prisma.lote_productos.update({
-      where: { id },
-      data: { estado: 0 },
-    });
+    try {
+      await this.obtenerLotePorId(id);
+      return await this.prisma.lote_productos.update({
+        where: { id },
+        data: { estado: 0 },
+      });
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Error al inactivar el lote',
+        error.message,
+      );
+    }
   }
 }

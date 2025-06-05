@@ -4,7 +4,6 @@ import { ProductosModule } from './productos/productos.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { MarcasModule } from './marcas/marcas.module';
 import { VentasModule } from './ventas/ventas.module';
-import { DevolucionesModule } from './devoluciones/devoluciones.module';
 import { RecetasModule } from './recetas/recetas.module';
 import { LotesModule } from './lotes/lotes.module';
 
@@ -16,7 +15,6 @@ import { LotesModule } from './lotes/lotes.module';
     MarcasModule,
     LotesModule,
     VentasModule,
-    DevolucionesModule,
     RecetasModule,
   ],
   controllers: [],

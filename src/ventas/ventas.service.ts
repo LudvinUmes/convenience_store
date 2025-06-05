@@ -34,7 +34,7 @@ export class VentasService {
    * @param data son los datos necesarios para crear la venta
    * @returns La venta recién creada con su ID asignado
    */
-  async registrarVentaCompleta(data: RegistrarVentaDto): Promise<string> {
+  async registrarVentaCompleta(data: RegistrarVentaDto): Promise<any> {
     try {
       console.log('=== INICIANDO REGISTRO DE VENTA ===');
       console.log('Datos recibidos:', JSON.stringify(data, null, 2));
@@ -241,7 +241,9 @@ export class VentasService {
         // Aquí podrías usar HttpService de NestJS para hacer un POST real
       });
 
-      return 'Venta registrada exitosamente y alertas procesadas';
+      return {
+        message: 'Venta registrada exitosamente y alertas procesadas',
+      };
     } catch (error: any) {
       console.error('=== ERROR EN REGISTRO DE VENTA ===');
       console.error('Error completo:', error);
@@ -319,24 +321,50 @@ export class VentasService {
    * @returns es la venta con la información actualizada
    */
   async updateVenta(id: number, data: UpdateVentaDto): Promise<ventas> {
-    return this.prisma.ventas.update({
-      where: { id },
-      data,
-    });
+    try {
+      const updatedVenta = await this.prisma.ventas.update({
+        where: { id },
+        data,
+      });
+      return updatedVenta;
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        // Prisma error code for "Record not found"
+        throw new NotFoundException(`Venta con id ${id} no encontrada`);
+      }
+      console.error('Error al actualizar la venta:', error);
+      throw new Error(`Error al actualizar la venta: ${error.message}`);
+    }
   }
 
   async marcarDetalleComoDevuelto(
     idVenta: number,
     usuarioModificacion: number,
   ): Promise<void> {
-    await this.prisma.detalle_ventas.updateMany({
-      where: { id_venta: idVenta, estado: 1 },
-      data: {
-        estado: 2,
-        fecha_modificacion: new Date(),
-        usuario_modificacion: usuarioModificacion,
-      },
-    });
+    try {
+      const result = await this.prisma.detalle_ventas.updateMany({
+        where: { id_venta: idVenta, estado: 1 },
+        data: {
+          estado: 2,
+          fecha_modificacion: new Date(),
+          usuario_modificacion: usuarioModificacion,
+        },
+      });
+
+      if (result.count === 0) {
+        throw new NotFoundException(
+          `No se encontraron detalles activos para la venta con id ${idVenta}`,
+        );
+      }
+    } catch (error: any) {
+      console.error('Error al marcar detalle como devuelto:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(
+        `Error al marcar detalle como devuelto: ${error.message}`,
+      );
+    }
   }
 
   /**
@@ -345,9 +373,19 @@ export class VentasService {
    * @returns es la venta que fue desactivada
    */
   async deleteVenta(id: number): Promise<ventas> {
-    return this.prisma.ventas.update({
-      where: { id },
-      data: { estado: 0 },
-    });
+    try {
+      const venta = await this.prisma.ventas.update({
+        where: { id },
+        data: { estado: 0 },
+      });
+      return venta;
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        // Prisma error code for "Record not found"
+        throw new NotFoundException(`Venta con id ${id} no encontrada`);
+      }
+      console.error('Error al desactivar la venta:', error);
+      throw new Error(`Error al desactivar la venta: ${error.message}`);
+    }
   }
 }

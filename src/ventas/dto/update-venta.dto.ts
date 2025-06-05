@@ -2,10 +2,6 @@ import { IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateVentaDto {
-  @ApiProperty({ example: 1, description: 'ID de la venta a actualizar' })
-  @IsInt()
-  id_venta!: number;
-
   @ApiPropertyOptional({
     example: 'ANULADA',
     description: 'Nuevo estado de la venta',

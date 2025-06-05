@@ -15,18 +15,18 @@ import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 
 @ApiTags('Categorías')
-@Controller('categorias')
+@Controller('')
 export class CategoriasController {
   constructor(private readonly categoriasService: CategoriasService) {}
 
-  @Get()
+  @Get('GET/categorias')
   @ApiOperation({ summary: 'Obtener todas las categorías' })
   @ApiResponse({ status: 200, description: 'Listado de categorías' })
   async obtenerTodos(): Promise<Categoria[]> {
     return await this.categoriasService.findAll();
   }
 
-  @Get(':id')
+  @Get('GET/categorias/:id')
   @ApiOperation({ summary: 'Obtener categoría por ID' })
   @ApiResponse({ status: 200, description: 'Categoría encontrada' })
   async obtenerPorId(
@@ -35,14 +35,14 @@ export class CategoriasController {
     return await this.categoriasService.findOne(id);
   }
 
-  @Post()
+  @Post('POST/categorias')
   @ApiOperation({ summary: 'Crear una nueva categoría' })
   @ApiResponse({ status: 201, description: 'Categoría creada' })
   async crear(@Body() data: CreateCategoriaDto): Promise<Categoria> {
     return await this.categoriasService.create(data);
   }
 
-  @Put(':id')
+  @Put('PUT/categorias/:id')
   @ApiOperation({ summary: 'Actualizar una categoría existente' })
   @ApiResponse({ status: 200, description: 'Categoría actualizada' })
   async actualizar(
@@ -52,7 +52,7 @@ export class CategoriasController {
     return await this.categoriasService.update(id, data);
   }
 
-  @Delete(':id')
+  @Delete('DELETE/categorias/:id')
   @ApiOperation({ summary: 'Eliminar una categoría (lógicamente)' })
   @ApiResponse({ status: 200, description: 'Categoría eliminada' })
   async eliminar(@Param('id', ParseIntPipe) id: number): Promise<Categoria> {

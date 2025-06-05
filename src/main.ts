@@ -6,6 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.setGlobalPrefix('tienda-conveniencia');
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Elimina propiedades que no estén en el DTO
