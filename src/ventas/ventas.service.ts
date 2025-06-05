@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ventas } from '@prisma/client';
+import {
+  Injectable,
+  NotFoundException,
+  HttpException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegistrarVentaDto } from './dto/registrar-venta.dto';
 import { UpdateVentaDto } from './dto/update-venta.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { AxiosResponse } from 'axios';
+import { ventas } from '@prisma/client';
 
 /**
  * Servicio que gestiona todas las operaciones relacionadas con las ventas.
@@ -11,7 +19,14 @@ import { UpdateVentaDto } from './dto/update-venta.dto';
  */
 @Injectable()
 export class VentasService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly ID_CAJA = process.env.ID_CAJA_DEFAULT || '1';
+  private readonly ID_SERVICIO =
+    process.env.ID_SERVICIO_TRANSACCION_DEFAULT || '1';
+  private readonly logger = new Logger(VentasService.name);
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService, // <-- aquí inyectamos HttpService
+  ) {}
 
   /**
    * Registra una nueva venta en el sistema.
@@ -24,7 +39,144 @@ export class VentasService {
       console.log('=== INICIANDO REGISTRO DE VENTA ===');
       console.log('Datos recibidos:', JSON.stringify(data, null, 2));
 
-      // Validaciones previas
+      if (!data.nit) {
+        throw new Error('No se proporcionó NIT del cliente');
+      }
+
+      // 0) CONSULTAR TODOS LOS CLIENTES y verificar si el NIT existe o no
+      let todosClientes: any[];
+      try {
+        const respuesta$: Promise<AxiosResponse> = firstValueFrom(
+          this.httpService.get(
+            'http://64.23.169.22:3001/pagos/cliente/obtener',
+          ),
+        );
+        const res = await respuesta$;
+        todosClientes = res.data.clientes;
+      } catch (err: any) {
+        this.logger.error(
+          'Error al obtener lista de clientes desde API de pagos',
+          err.stack,
+        );
+        throw new Error(
+          'No se pudo verificar existencia del NIT en la API de pagos',
+        );
+      }
+
+      // Buscar el cliente por su NIT en el arreglo recibido
+      let clienteEncontrado = todosClientes.find((c) => c.nit === data.nit);
+      if (!clienteEncontrado) {
+        console.log(
+          `❌ El NIT ${data.nit} no existe. Se creará un cliente nuevo...`,
+        );
+
+        // Llamada al endpoint para crear un nuevo cliente
+        const Dpi = Date.now().toString();
+        try {
+          const clientePayload = {
+            NombreCliente: data.nombre,
+            ApellidosCliente: data.nombre,
+            Nit: data.nit || 'CF',
+            Direccion: 'Ciudad',
+            Telefono: '00000000',
+            Email: 'correo@correo.com',
+            Dpi: Dpi,
+          };
+
+          console.log(clientePayload);
+
+          const crearCliente$: Promise<AxiosResponse> = firstValueFrom(
+            this.httpService.post(
+              'http://64.23.169.22:3001/pagos/cliente/crear',
+              clientePayload,
+            ),
+          );
+          const res = await crearCliente$;
+          console.log(res.data);
+          clienteEncontrado = res.data;
+
+          console.log(`✔️ Cliente nuevo creado con ID:`, clienteEncontrado._id);
+        } catch (err: any) {
+          this.logger.error(
+            'Error al crear cliente nuevo en API de pagos',
+            err.stack,
+          );
+          throw new Error(
+            'No se pudo crear un nuevo cliente en la API de pagos',
+          );
+        }
+      } else {
+        console.log(
+          `✔️ El NIT ${data.nit} existe (ID interno: ${clienteEncontrado._id})`,
+        );
+      }
+
+      try {
+        // 1. Obtener los detalles del producto desde DB
+        const productosInfo = await Promise.all(
+          data.detalles.map(async (detalle) => {
+            const producto = await this.prisma.productos.findUnique({
+              where: { id: detalle.id_producto },
+              select: {
+                nombre: true,
+                precio_referencia: true,
+              },
+            });
+
+            if (!producto) {
+              throw new Error(
+                `Producto con ID ${detalle.id_producto} no encontrado`,
+              );
+            }
+
+            return {
+              Producto: producto.nombre,
+              Cantidad: detalle.cantidad.toString(),
+              Precio: producto.precio_referencia.toString(),
+              Descuento: '0', // Puedes ajustar si hay descuento
+            };
+          }),
+        );
+
+        // 2. Mapear métodos de pago
+        const metodosPagoPayload = data.pagos.map((pago) => {
+          return {
+            NoTarjeta: '0000',
+            IdMetodo: '1', // Por defecto EFECTIVO = 1
+            Monto: pago.monto.toString(),
+            IdBanco: '1',
+          };
+        });
+
+        // 3. Construir el payload final
+        const transaccionPayload = {
+          Nit: data.nit || 'CF',
+          IdCaja: '1',
+          IdServicioTransaccion: '5',
+          Detalle: productosInfo,
+          MetodosPago: metodosPagoPayload,
+        };
+        console.log(transaccionPayload);
+        console.log('⏩ Enviando datos a /transacciones/crear:');
+
+        const respuesta$: Promise<AxiosResponse> = firstValueFrom(
+          this.httpService.post(
+            'http://64.23.169.22:3001/pagos/transacciones/crear',
+            transaccionPayload,
+          ),
+        );
+
+        const res = await respuesta$;
+        console.log('✅ Transacción registrada en sistema externo:', res.data);
+      } catch (err: any) {
+        this.logger.error(
+          '❌ Error al registrar transacción externa',
+          err.stack,
+        );
+        throw new Error('Error al registrar transacción en sistema de pagos');
+      }
+
+      // Validación de detalles (una sola vez)
       if (!data.detalles || data.detalles.length === 0) {
         throw new Error('No se proporcionaron detalles de venta');
       }

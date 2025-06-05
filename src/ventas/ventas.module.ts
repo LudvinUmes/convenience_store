@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { VentasController } from './ventas.controller';
+import { HttpModule } from '@nestjs/axios';
 import { VentasService } from './ventas.service';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { VentasController } from './ventas.controller';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 /**
  * Módulo principal de ventas.
@@ -10,9 +11,18 @@ import { PrismaModule } from 'src/prisma/prisma.module';
  * Se integra con el módulo de Prisma para acceder a la base de datos.
  */
 @Module({
+  imports: [
+    HttpModule.register({
+      // Ajusta esta URL base al host de tu API de pagos:
+      baseURL:
+        process.env.PAGOS_API_BASE_URL || 'https://api.tu-dominio.com/pagos',
+      timeout: 5000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+  ],
   controllers: [VentasController],
-  providers: [VentasService],
-  imports: [PrismaModule],
-  exports: [VentasService],
+  providers: [VentasService, PrismaService],
 })
 export class VentasModule {}
